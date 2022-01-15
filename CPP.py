@@ -14,8 +14,8 @@
 # Krok 3 : Vytvoříme všechny možné páry lichých vrcholů.
 # Krok 4 : Pro každou skupinu párů určíme nejkratší cestu.
 # Krok 5 : Najdeme skupinu párů s nejkratší cestou.
-# Krok 6 : Upravím graf a to tak že přidáme další hrany z kroku 5
-# Krok 7 : Délka nektrtší cesty je součet cest vrchol2 modifikovaném grafu
+# Krok 6 : Upravím graf a to tak že přidáme další hrany z kroku 5 do grafu
+# Krok 7 : Délka nektratší cesty je součet cest v modifikovaném grafu
 # Krok 8 : Uzavřený eulerovský tah upraveného grafu je hledaná cesta.
 
 # Příklad:
@@ -42,13 +42,14 @@
 #
 # Úprava grafu: Zdvojíme hrany nejkratších cest: (B-A, A-D, C-F, F-E)
 #
-# Nejkratší celková cesta: je poté součet všech hran vrchol2 neupraveném grafu nebo
-# součet nejkratší cesty (B-D) a součet hran vrchol2 neupraveněm grafu
-# součet hran vrchol2 upraveném grafu = 24 + 6 = 30
+# Nejkratší celková cesta: je poté součet všech hran v neupraveném grafu nebo
+# součet nejkratší cesty (B-D) a součet hran v neupraveněm grafu
+# součet hran v upraveném grafu = 24 + 6 = 30
 # 
 # Trasa je poté uzavřený eulerovský tah: A-B B-C C-E E-F F-C C-F F-E E-D D-A A-D D-B B-A
 #
 # Zdroje:
+# https://www.youtube.com/watch?v=JCSmxUO0v3k&ab_channel=MathMathsMathematics
 # https://www.geeksforgeeks.org/chinese-postman-route-inspection-set-1-introduction/
 # https://www.geeksforgeeks.org/fleurys-algorithm-for-printing-eulerian-nejkratsi_cesta/?ref=lbp
 # https://towardsdatascience.com/chinese-postman-in-python-8b1187a3e5a
@@ -75,7 +76,7 @@ class Graph:
         self.matice_sousednosti = [[BEZ_HRANY] * max_vertices for _ in range(max_vertices)] 
         # pomocný spojový seznam pro upravený graf a nelezení cesty 
         self.seznam = defaultdict(list)
-        # list uzlu, kazdy uzel ma sve id, pod kterym je najdeme vrchol2 listu uzlu
+        # list uzlu, kazdy uzel ma sve id, pod kterym je najdeme v listu uzlu
         self.vrcholy = []
         # aktualni pocet uzlu
         self.velikost_matice = 0  
@@ -89,9 +90,9 @@ class Graph:
     def vrchol_existuje(self, vrchol_id):
         return vrchol_id >= 0 and vrchol_id < self.velikost_matice
 
-    # vrátí vrcholy vrchol2 listu
+    # vrátí vrcholy v listu
     def vypis_vrcholu(self):
-        return [vrchol2.id for vrchol2 in self.vrcholy]
+        return [vrchol.id for vrchol in self.vrcholy]
 
     def sousedni_vrchol(self, vrchol_id):
         vedlejsi_vrchol = []
@@ -128,7 +129,7 @@ class Graph:
     # vypíše matici sousednosti grafu
     def vypis_matice_sousednosti(self):
         print("\nAdjecency matice_sousednosti:")
-        # pokud budeme mit vrchol2 matici None typ, tak bude vyhazovat err
+        # pokud budeme mit v matici None typ, tak bude vyhazovat err
         # pomoci vnoreneho cyklu
         for sublist in self.matice_sousednosti:
             for i in sublist:
@@ -182,7 +183,8 @@ class Graph:
         for index, key in enumerate(self.seznam[vrchol2]):
             if key == vrchol1:
                 self.seznam[vrchol2].pop(index)
-
+    
+    # nalezení 
     def prohledavani_do_hloubky(self, vrchol2, prohledano):
         pocitadlo = 1
         prohledano[vrchol2] = True
@@ -222,7 +224,8 @@ class Graph:
         vrchol1 = 0
         predposledni_vrchol = self.Euleruv_tah_z_vrcholu(vrchol1)
         print("%d-%d " %(predposledni_vrchol,vrchol1)),
-        
+
+#samotné řešení problému čínského listonoše       
 # Sečte všechny hrany grafu
 def SoucetDelkyHran(MaticeSousednosti):
     soucet = 0
@@ -279,7 +282,7 @@ def NajdiLicheVrcholy(MaticeSousednosti):
     LicheStupne = [i for i in range(len(stupen)) if stupen[i]%2!=0]
     return LicheStupne
 
-# Funkce pro generování párování vrchol2 grafu
+# Funkce pro generování párování vrcholu grafu
 def Kombinace_lichych_vrcholu(licheVrcholy):
     Pary = []
     for i in range(len(licheVrcholy)-1):
@@ -368,6 +371,7 @@ g.pridej_vrchol(5)
 
 print("Vertices", g.vypis_vrcholu())
 print()
+
 # přidáme hrany
 g.pridej_hranu(0, 1, 1)
 g.pridej_hranu(0, 3, 2)
@@ -381,4 +385,5 @@ g.pridej_hranu(4, 5, 1)
 # vytiskneme si  matici sousednosti
 g.vypis_matice_sousednosti()
 
+# najdeme nejoptimálnější cestu 
 nejoptimalnejsi_cesta(g.matice_sousednosti)
